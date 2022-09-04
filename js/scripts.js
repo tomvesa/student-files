@@ -1,3 +1,11 @@
+//create a search input field
+function renderSearchField(target){
+const searchField = document.createElement("FORM");
+      searchField.innerHTML = `<input type="search" id="search-input" class="search-input" placeholder="Search...">
+                                <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">`
+      
+      target.append(searchField);
+}
 
 // api call configuration
 const apiConfig = (url, query={}, data=[]) =>({
@@ -38,11 +46,13 @@ const apiConfig = (url, query={}, data=[]) =>({
                 last : lastName},
         email,
         location: {city,
-                   country}
+                   country},
+        index 
 
                 } = userData;
    const div = document.createElement("DIV");
           div.className = "card";
+          div.dataset.index = index;
           div.innerHTML =   `<div class="card-img-container">
                                 <img class="card-img" src="${avatar}" alt="profile picture">
                             </div>
@@ -107,15 +117,41 @@ function getDobDate(date){
     return `${month >= 10 ? month : `0${month}` } / ${dob.getDate()} /${dob.getFullYear()}`; 
 }
 
+function searchingUser(){
+const searchBtn = document.getElementById("search-submit");
+searchBtn.addEventListener("click", e=>{
+  e.preventDefault();
+   const searchValue = document.getElementById("search-input").value.toLowerCase();
 
-  // running the code
+   usersAPIConfig.data.reduce( (acc, item) => {
+    const card = document.querySelector(`[data-index="${item.index}"]`);       
+            if(item.name.first.toLowerCase()
+                              .includes(searchValue)){
+                        card.style.display = "inherit";
+            } else {
+                        card.style.display = "none";
+            }
+    }, []);
+});
+
+
+}  // running the code
   const body = document.body;
+  const searchBox = document.querySelector(".search-container")
   const gallery = document.getElementById("gallery");
+
+  renderSearchField(searchBox);
   let usersAPIConfig = apiConfig("https://randomuser.me/api/1.4/", 
                             {results : 12, 
                             inc : "nat,name,location,email,picture,dob,cell",
                             nat : "us,gb,au,nz"} );
   
   makeApiCall(usersAPIConfig)
-    .then(() => usersAPIConfig.data.forEach(item => createCard(item)));
+    .then(() => {
+                  usersAPIConfig.data.forEach((item, index) => {
+                            item.index = index;
+                            createCard(item)});
+                            searchingUser();
+                });
+  
 
