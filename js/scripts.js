@@ -104,7 +104,7 @@ function getDobDate(date){
     const dob = new Date(date);
     let month = dob.getMonth() + 1;
 
-    return `${dob.getDate()}/${month >= 10 ? month : `0${month}` }/${dob.getFullYear()}`; 
+    return `${month >= 10 ? month : `0${month}` } / ${dob.getDate()} /${dob.getFullYear()}`; 
 }
 
 
