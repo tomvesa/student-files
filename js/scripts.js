@@ -63,27 +63,31 @@ const apiConfig = (url, query={}, data=[]) =>({
                             </div> `;
           div.addEventListener("click", (e)=>{
             displayModal(userData);
+ 
           });                  
           gallery.appendChild(div);     
  }
 
  function displayModal(userData){
-  let {
-    email,
-    cell,
-    picture : {medium : avatar} ,
-    name    : {first : firstName,
-                last : lastName},
-    location: {city,
-               country,
-               postcode,
-               street:{number :streetNum, 
-                        name:streetName}
-              },
-    dob : {date : dobDate}
-            } = userData;
+  let {// deconstruct user data
+        email,
+        cell,
+        index,
+        picture : {medium : avatar} ,
+        name    : {first : firstName,
+                    last : lastName},
+        location: {city,
+                  country,
+                  postcode,
+                  street:{number :streetNum, 
+                            name:streetName}
+                  },
+        dob : {date : dobDate}
+                                              } = userData;
+
     const div = document.createElement("DIV");
           div.className = "modal-container";
+          div.dataset.index = index;
           div.innerHTML = `<div class="modal">
               <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
               <div class="modal-info-container">
@@ -95,43 +99,101 @@ const apiConfig = (url, query={}, data=[]) =>({
                   <p class="modal-text">${cell}</p>
                   <p class="modal-text"> ${streetNum} ${streetName}, ${city}, ${postcode}</p>
                   <p class="modal-text">Birthday: ${getDobDate(dobDate)}</p>
+              <div class="modal-btn-container">                  
+                <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
+                <button type="button" id="modal-next" class="modal-next btn">Next</button>
+              </div>
               </div>`;
 
-          body.appendChild(div);
+              body.appendChild(div);
 
-          closeModal();
+          closeModal(div);
+          getPreviousCard(index);
+          getNextCard(index);
+
+
+
 
  }
 
- function closeModal(){
-    const closeBtn = document.getElementById("modal-close-btn");
+ function closeModal(elem){
+  console.log(elem);
+    const closeBtn = elem.querySelector("#modal-close-btn");
           closeBtn.addEventListener("click", e=>{
             closeBtn.parentElement.parentElement.remove();
           })
  }
 
+ function getNextCard(index){
+  //add listener to a next button
+  // check visible cards and decide what is the next card to display
+  const currentCardIndex = index;
+        const nextBtn = document.getElementById('modal-next');
+               nextBtn.addEventListener("click", e =>{
+                //first check all card that are visible
+                const visibleCardIndexes = [...document.querySelectorAll(".card:not(.card-invisible)")]
+                                                .map(item => parseInt(item.dataset.index));
+                // get the index of this card out of those currently visible, then get next visible card data
+                // to display another modal                                 
+                const nowVisibleCardIndex = parseInt(visibleCardIndexes.indexOf(index));
+                if(nowVisibleCardIndex < visibleCardIndexes.length - 1 ){                               
+                  document.querySelector('.modal-container').remove();
+                  const  nextCardIndex = visibleCardIndexes.indexOf(currentCardIndex) + 1;
+                  const nextCardData = usersAPIConfig.data.find(item => item.index === visibleCardIndexes[nextCardIndex]);
+                displayModal(nextCardData);
+                }
+        });
+      
+}
+
+ function getPreviousCard(index){
+    //add listener to a previous button
+  // check visible cards and decide what is the previous card to display
+  const currentCardIndex = index;
+        const prevBtn = document.querySelector('#modal-prev');
+               prevBtn.addEventListener("click", e =>{
+      //first check all card that are visible
+                const visibleCardIndexes = [...document.querySelectorAll(".card:not(.card-invisible)")]
+                                                .map(item => parseInt(item.dataset.index));
+    // get the index of this card out of those currently visible, then get previous visible card data
+      // to display another modal                                           
+                const nowVisibleCardIndex = parseInt(visibleCardIndexes.indexOf(index));
+                if(nowVisibleCardIndex){                               
+                document.querySelector('.modal-container').remove();
+              const  prevCardIndex = visibleCardIndexes.indexOf(currentCardIndex) - 1;
+                const prevCardData = usersAPIConfig.data.find(item => item.index === visibleCardIndexes[prevCardIndex]);
+                displayModal(prevCardData);
+
+                }
+        });
+      
+}
+
 function getDobDate(date){
+      // render date to display in mm/dd/yyyy
     const dob = new Date(date);
     let month = dob.getMonth() + 1;
-
     return `${month >= 10 ? month : `0${month}` } / ${dob.getDate()} /${dob.getFullYear()}`; 
 }
 
 function searchingUser(){
+  // search input funtionality after clicking the search button
 const searchBtn = document.getElementById("search-submit");
 searchBtn.addEventListener("click", e=>{
   e.preventDefault();
    const searchValue = document.getElementById("search-input").value.toLowerCase();
-
-   usersAPIConfig.data.reduce( (acc, item) => {
-    const card = document.querySelector(`[data-index="${item.index}"]`);       
-            if(item.name.first.toLowerCase()
+// add class to hide cards that do not match the search value of the name
+   usersAPIConfig.forEach( item => {
+    const card = document.querySelector(`[data-index="${item.index}"]`);    
+          const {first: firstName, last : lastName} = item.name;  
+          const fullName = `${firstName} ${lastName}` 
+            if(fullName.toLowerCase()
                               .includes(searchValue)){
-                        card.style.display = "inherit";
+                        card.classList.remove("card-invisible");
             } else {
-                        card.style.display = "none";
+                        card.classList.add("card-invisible");
             }
-    }, []);
+    });
 });
 
 
@@ -151,7 +213,7 @@ searchBtn.addEventListener("click", e=>{
                   usersAPIConfig.data.forEach((item, index) => {
                             item.index = index;
                             createCard(item)});
-                            searchingUser();
+                            searchingUser(); // load searching functionality
                 });
   
 
