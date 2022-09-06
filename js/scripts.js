@@ -34,9 +34,15 @@ const apiConfig = (url, query={}, data=[]) =>({
   } 
 
   async function makeApiCall(config){
-    const response = await fetch(`${config.url}?${createQueryString(config.query)}`);
+    const response = await fetch(`${config.url}?${createQueryString(config.query)}`)
+                            .catch(error => displayErrorMessage(error, gallery));
     const json = await response.json();
     return config.data = json.results;
+  }
+
+  function displayErrorMessage(error, messageTarget){
+    console.log("Something went wrong! " , error)
+    messageTarget.innerHTML = `<h2>OOPS, SOMETHING WENT WRONG!</h2>`;
   }
   
  function createCard(userData){
@@ -117,8 +123,7 @@ const apiConfig = (url, query={}, data=[]) =>({
  }
 
  function closeModal(elem){
-  console.log(elem);
-    const closeBtn = elem.querySelector("#modal-close-btn");
+      const closeBtn = elem.querySelector("#modal-close-btn");
           closeBtn.addEventListener("click", e=>{
             closeBtn.parentElement.parentElement.remove();
           })
