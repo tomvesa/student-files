@@ -90,6 +90,8 @@ header h1 {
     border: 1px solid rgba(50, 50, 50, 0.3);
     transition: .4s ease-out;
     overflow: hidden;
+    box-shadow: 10px 10px 15px -8px;
+    transition: transform .2s;
 }
 
 .card-img {
@@ -111,6 +113,10 @@ header h1 {
     color: rgba(50, 50, 50, 0.7);
     margin: 7px auto;
     transition: .4s ease-out;
+}
+
+.card-invisible {
+    display : none;
 }
 
 .cap {
@@ -200,7 +206,8 @@ header h1 {
     padding: 0.75em 1.5em;
     background: rgba(0, 0, 0, 0.8);
     border-radius: 0.35em;
-    transition: .4s ease-out;
+    transition:  .4s ease-out;
+    
   }
   
 
@@ -246,6 +253,14 @@ header h1 {
     .card:hover {
         background: rgba(255, 255, 255, 1);
         border: 1px solid rgba(50, 50, 50, 0.9);
+        transform: scale(1.05); 
+    }
+
+    .card:hover img{
+        background: rgba(255, 255, 255, 1);
+        border: 1px solid rgba(50, 50, 50, 0.9);
+
+}
     }
 
     .card:hover .card-text {
