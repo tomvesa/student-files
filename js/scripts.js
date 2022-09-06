@@ -188,7 +188,7 @@ searchBtn.addEventListener("click", e=>{
   e.preventDefault();
    const searchValue = document.getElementById("search-input").value.toLowerCase();
 // add class to hide cards that do not match the search value of the name
-   usersAPIConfig.forEach( item => {
+   usersAPIConfig.data.forEach( item => {
     const card = document.querySelector(`[data-index="${item.index}"]`);    
           const {first: firstName, last : lastName} = item.name;  
           const fullName = `${firstName} ${lastName}` 
